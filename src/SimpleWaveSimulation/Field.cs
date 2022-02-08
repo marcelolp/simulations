@@ -29,7 +29,7 @@ namespace SimpleWaveSimulation
         private float _t = 0.0f;                    // total time passed
         private float _max_wave_speed;              // for easier calculation of Courant number
         private float _max_courant = 0.5f;
-        private float _dissipation_coeff = 1.0f;    // speed of wave energy dissipation
+        private float _dampening_coeff = 1.0f;    // speed of wave energy dissipation
 
         private float[] _color;                     // contains (r,g,b)-color values for all gridpoints
         private float[] _u;                         // contains the simulation grid at the current timestep
@@ -115,22 +115,45 @@ namespace SimpleWaveSimulation
 
                     bool out_of_bounds = false;
 
-                    /// ============================== Boundary conditions ===================================== ///
+                    /// ============================== Boundary functions ===================================== ///
                     /// Pretty much any 2d signed distance function can be used here to create obstacles for the wave
-                    if (Util.Dist(x, y, NX/2, NY/2) > 15*NY/32)                                                                                           // circular boundary
-                    //if (x == 0 || x == NX-1 || y == 0 || y == NY-1)                                                                                               // rectangular boundary
-                    //if (x <= 10 + Util.TriangleWave(y, 10.0f, NY/20) || x >= NX - 11 + Util.TriangleWave(y, 10.0f, NY/20) 
-                    //    || y <= 10 + Util.TriangleWave(x, 10.0f, NX/30) || y >= NY - 11 + Util.TriangleWave(x, 10.0f, NX/30))                                     // spiked boundary
+                    //if (Util.Dist(x, y, NX/2, NY/2) > 15*NY/32)                                                                                           // circular boundary
+                    if (x == 0 || x == NX-1 || y == 0 || y == NY-1)                                                                                               // rectangular boundary
+                    //if (x <= 20 + Util.TriangleWave(y, 30.0f, NY/20) || x >= NX - 21 + Util.TriangleWave(y, 30.0f, NY/20) 
+                    //    || y <= 20 + Util.TriangleWave(x, 30.0f, NX/30) || y >= NY - 21 + Util.TriangleWave(x, 30.0f, NX/30))                                     // spiked boundary
                     //if (Util.Dist(x, y, NX / 2, NY / 2) > 7 * NY / 16.0 - Util.TriangleWave((float)(Math.Atan2(y - NY / 2, x - NX / 2) + Math.PI), 10.0f, 0.133f))  // spiked circular boundary
                     {
 
-                        out_of_bounds = true;
-                        val = 0.0f; 
-                        if (_first)
-                        {
-                            out_of_bounds = true;
-                            val = 0.0f;
-                        }
+                        // No boundary like on a torus surface
+                        float xym, xpy, xmy, xyp;
+                        if (x == 0)
+                            xmy = _u[NX-1 + y * NX];
+                        else 
+                            xmy = _u[x_minus + y * NX];
+                        if (y == 0)
+                            xym = _u[x + (NY-1) * NX];
+                        else
+                            xym = _u[x + y_minus * NX];
+                        if (x == NX - 1)
+                            xpy = _u[0 + y * NX];
+                        else
+                            xpy = _u[x_plus + y * NX];
+                        if (y == NY - 1)
+                            xyp = _u[x + 0 * NX];
+                        else
+                            xyp = _u[x + y_plus * NX];
+
+                        val = 2.0f * _u[x + y * NX] - _u_last[x + y * NX] + C_square * (xym + xpy + xmy + xyp - 4.0f * _u[x + y * NX]) + dt * (dt * f());
+
+                        // Reflecting boundary conditions (+inversed sign)
+                        //out_of_bounds = true;
+                        //val = 0.0f; 
+                        //if (_first)
+                        //{
+                        //    out_of_bounds = true;
+                        //    val = 0.0f;
+                        //}
+
                     }
                     else
                     {
@@ -143,7 +166,8 @@ namespace SimpleWaveSimulation
                             - 4.0f * _u[x + y * NX] ) + dt * (dt * f());
                     }
 
-                    //val *= 1.0f - _dissipation_coeff * dt;         // 100% not the right way to do this but looks nice. This makes the dissipation speed proportional to the local energy 
+                    // 100% not the right way to do this but looks nice. This makes the dampening proportional to the energy of the wave at that point
+                    //val *= 1.0f - _dampening_coeff * dt;         
                     _u_temp[x + y * NX] = val;
                     int idx = (3 * x) + (3 * y) * NX;
 
@@ -187,8 +211,8 @@ namespace SimpleWaveSimulation
                     //float wavespeed = (x + y) < NY ? 4.0f : 6.0f;
                     //float wavespeed = y < NX/3 ? 4.0f : 6.0f;
                     //float wavespeed = x < NX/2 ? 4.0f : 6.0f;
-                    //float wavespeed = (x < NX/2 && x > 2*NX/5) ? 4.0f : 6.0f;
-                    float wavespeed = 6.0f;
+                    float wavespeed = (x < NX/2 && x > 2*NX/5) ? 4.0f : 6.0f;
+                    //float wavespeed = 6.0f;
                     _max_wave_speed = wavespeed > _max_wave_speed ? wavespeed : _max_wave_speed;
                     _wave_speed[x + y * NX] = wavespeed;
 
