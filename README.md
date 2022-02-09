@@ -10,8 +10,10 @@ create interesting results and in the Windows.cs-file are general parameters lik
 
 ### Content
 
-1. *HeatSimulation*: Solves the heat equation for a given initial distribution</li>
+1. *HeatSimulation*: Solves the heat equation for a given initial distribution
 2. *SimpleWaveEquation*: Solves the linear 2D wave equation for an initial function with some additional 
-  functionality for custom boundary conditions, domain properties and generator functions</li>
+  functionality for custom boundary conditions, domain properties and generator functions
+3. *ReactionDiffusionSimulation*: Solves the equation for a two component reaction diffusion system for 
+  some given parameters that can be edited
 
 #### Advise for optimization or improvement is always welcome!
