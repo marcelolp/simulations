@@ -10,8 +10,8 @@ namespace SimpleWaveSimulation
     /// </summary>
     internal class Field
     {
-        private const bool SHOW_WAVE_ENERGY = true;
-
+        private const bool SHOW_WAVE_ENERGY = false; // overrides SHOW_WAVE_ABS
+        private const bool SHOW_WAVE_ABS = true;     // absolute value of the amplitude
 
         internal float[] Color
         {
@@ -31,6 +31,7 @@ namespace SimpleWaveSimulation
         private float _max_courant = 0.5f;
         private float _dampening_coeff = 1.0f;    // speed of wave energy dissipation
 
+        private bool[] _out_of_bounds;              // determines if a gridpoint is out of bounds
         private float[] _color;                     // contains (r,g,b)-color values for all gridpoints
         private float[] _u;                         // contains the simulation grid at the current timestep
         private float[] _u_last;                    // contains the simulation grid at the last timestep
@@ -47,6 +48,7 @@ namespace SimpleWaveSimulation
             NX = nX;
             NY = nY;
             _dt = dt;
+            _out_of_bounds = new bool[NX * NY];
             _u = new float[NX * NY];
             _u_last = new float[NX * NY];
             _u_temp = new float[NX * NY];
@@ -113,46 +115,55 @@ namespace SimpleWaveSimulation
                     //float f() => 30000.0f * (float)(Math.Sin(_t * 100.0f)) * Util.Gaussian(x, y, 3*NX / 5, NY / 4, 15.0f, 15.0f, 1.0f);           // static oscillator
                     //float f() => Util.Gaussian(x, y, NX / 2 + _t * 400.0f, NY / 2, 15.0f, 15.0f, 20000.0f * (float)Math.Sin(_t * 100.0f));        // moving oscillator
 
-                    bool out_of_bounds = false;
 
+                    // if the point was already marked as out of bounds, dont recompute the exdpensive boundary condition
+                    // only works for the reflecting boundarys but should improve the speed quite a bit if there are a lot of obstacles
+                    bool out_of_bounds = _out_of_bounds[x + y * NX]; 
+                    if (out_of_bounds)
+                    {
+                        val = 0.0f;
+                    } else
                     /// ============================== Boundary functions ===================================== ///
                     /// Pretty much any 2d signed distance function can be used here to create obstacles for the wave
-                    //if (Util.Dist(x, y, NX/2, NY/2) > 15*NY/32)                                                                                           // circular boundary
-                    if (x == 0 || x == NX-1 || y == 0 || y == NY-1)                                                                                               // rectangular boundary
+                    //if (Util.Dist(x, y, NX/2, NY/2) > 15*NY/32)                                                                                                     // circular boundary
                     //if (x <= 20 + Util.TriangleWave(y, 30.0f, NY/20) || x >= NX - 21 + Util.TriangleWave(y, 30.0f, NY/20) 
-                    //    || y <= 20 + Util.TriangleWave(x, 30.0f, NX/30) || y >= NY - 21 + Util.TriangleWave(x, 30.0f, NX/30))                                     // spiked boundary
+                    //    || y <= 20 + Util.TriangleWave(x, 30.0f, NX/30) || y >= NY - 21 + Util.TriangleWave(x, 30.0f, NX/30))                                       // spiked boundary
                     //if (Util.Dist(x, y, NX / 2, NY / 2) > 7 * NY / 16.0 - Util.TriangleWave((float)(Math.Atan2(y - NY / 2, x - NX / 2) + Math.PI), 10.0f, 0.133f))  // spiked circular boundary
+                    //if (x == 0 || x == NX-1 || y == 0 || y == NY-1)                                                                                                 // rectangular boundary
+                    if (Util.UnionSDF(Util.UnionSDF(Util.CircleSDF(x, y, NX/3, NY/4, NX/15),
+                                                    Util.RectSDF(x, y, NX/4, 2*NY/3, NX/20, NY/3)), 
+                                      Util.CircleSDF(x, y, 2*NX/3, NY/2, NX/8)) < 0 
+                         || x == 0 || x == NX - 1 || y == 0 || y == NY - 1)                                             // some circles and a rectangle
                     {
-
                         // No boundary like on a torus surface
-                        float xym, xpy, xmy, xyp;
-                        if (x == 0)
-                            xmy = _u[NX-1 + y * NX];
-                        else 
-                            xmy = _u[x_minus + y * NX];
-                        if (y == 0)
-                            xym = _u[x + (NY-1) * NX];
-                        else
-                            xym = _u[x + y_minus * NX];
-                        if (x == NX - 1)
-                            xpy = _u[0 + y * NX];
-                        else
-                            xpy = _u[x_plus + y * NX];
-                        if (y == NY - 1)
-                            xyp = _u[x + 0 * NX];
-                        else
-                            xyp = _u[x + y_plus * NX];
+                        //float xym, xpy, xmy, xyp;
+                        //if (x == 0)
+                        //    xmy = _u[NX-1 + y * NX];
+                        //else 
+                        //    xmy = _u[x_minus + y * NX];
+                        //if (y == 0)
+                        //    xym = _u[x + (NY-1) * NX];
+                        //else
+                        //    xym = _u[x + y_minus * NX];
+                        //if (x == NX - 1)
+                        //    xpy = _u[0 + y * NX];
+                        //else
+                        //    xpy = _u[x_plus + y * NX];
+                        //if (y == NY - 1)
+                        //    xyp = _u[x + 0 * NX];
+                        //else
+                        //    xyp = _u[x + y_plus * NX];
 
-                        val = 2.0f * _u[x + y * NX] - _u_last[x + y * NX] + C_square * (xym + xpy + xmy + xyp - 4.0f * _u[x + y * NX]) + dt * (dt * f());
+                        //val = 2.0f * _u[x + y * NX] - _u_last[x + y * NX] + C_square * (xym + xpy + xmy + xyp - 4.0f * _u[x + y * NX]) + dt * (dt * f());
 
-                        // Reflecting boundary conditions (+inversed sign)
-                        //out_of_bounds = true;
-                        //val = 0.0f; 
-                        //if (_first)
-                        //{
-                        //    out_of_bounds = true;
-                        //    val = 0.0f;
-                        //}
+                        //Reflecting boundary conditions(+inversed sign)
+                        _out_of_bounds[x + y * NX] = true;
+                        val = 0.0f;
+                        if (_first)
+                        {
+                            _out_of_bounds[x + y * NX] = true;
+                            val = 0.0f;
+                        }
 
                     }
                     else
@@ -173,7 +184,9 @@ namespace SimpleWaveSimulation
 
                     if (SHOW_WAVE_ENERGY)
                         (_color[0 + idx], _color[1 + idx], _color[2 + idx]) = out_of_bounds ? (0.0f, 0.0f, 0.0f) : Util.ToRgbJet(0.0f, 1.0f, val * val);
-                    else 
+                    else if (SHOW_WAVE_ABS)
+                        (_color[0 + idx], _color[1 + idx], _color[2 + idx]) = out_of_bounds ? (0.0f, 0.0f, 0.0f) : Util.ToRgbJet(0.0f, 1.0f, Math.Abs(val));
+                    else
                         (_color[0 + idx], _color[1 + idx], _color[2 + idx]) = out_of_bounds ? (0.0f, 0.0f, 0.0f) : Util.ToRgbJet(-1.0f, 1.0f, val);
 
                 }
@@ -204,15 +217,16 @@ namespace SimpleWaveSimulation
                     //_u[x + y * NX] = (x == NX/2 - 5 && y > NY/4 && y < 3*NY/4) ? 0.75f : 0.0f;
                     //_u[x + y * NX] = 0.02f * (float)Math.Sin(5.0f * x * (Math.PI * 2.0f / NX)) * (float)Math.Sin(0.5f * y * (Math.PI * 2.0f / NY));
                     //_u[x + y * NX] = Util.Gaussian(x, y, NX/6, NY/2, 15.0f, 15.0f, 1.0f);
-                    _u[x + y * NX] = Util.Gaussian(x, y, NX/3, NY/2, 5.0f, 5.0f, 3.0f);
+                    //_u[x + y * NX] = Util.Gaussian(x, y, NX/3, NY/2, 5.0f, 5.0f, 3.0f);
+                    _u[x + y * NX] = Util.Gaussian(x, y, NX/2, NY/2, 5.0f, 5.0f, 3.0f);
 
 
                     /// ============================== wavespeed conditions ===================================== ///
                     //float wavespeed = (x + y) < NY ? 4.0f : 6.0f;
                     //float wavespeed = y < NX/3 ? 4.0f : 6.0f;
                     //float wavespeed = x < NX/2 ? 4.0f : 6.0f;
-                    float wavespeed = (x < NX/2 && x > 2*NX/5) ? 4.0f : 6.0f;
-                    //float wavespeed = 6.0f;
+                    //float wavespeed = (x < NX / 2 && x > 2 * NX / 5) ? 4.0f : 6.0f;
+                    float wavespeed = 6.0f;
                     _max_wave_speed = wavespeed > _max_wave_speed ? wavespeed : _max_wave_speed;
                     _wave_speed[x + y * NX] = wavespeed;
 

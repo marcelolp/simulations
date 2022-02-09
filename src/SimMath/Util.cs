@@ -9,6 +9,26 @@ namespace SimMath
     public static class Util
     {
 
+        public static float UnionSDF(float dist1, float dist2)
+        {
+            return Math.Min(dist1, dist2);
+        }
+
+        public static float RectSDF(float x, float y, float bx, float by, float lx, float ly)
+        {
+            float dx = Math.Abs(x - bx) - lx;
+            float dy = Math.Abs(y - by) - ly;
+            float fmin = (float)Math.Min(0.0f, Math.Max(dx, dy));
+            float fmaxx = (float)Math.Max(0.0f, dx);
+            float fmaxy = (float)Math.Max(0.0f, dy);
+            return Math.Abs(Dist(fmaxx, fmaxy, 0.0f, 0.0f)) + fmin;
+        }
+
+        public static float CircleSDF(float x, float y, float cx, float cy, float r)
+        {
+            return Math.Abs(Dist(x, y, cx, cy)) - r;
+        }
+
         public static float TriangleWave(float t, float amp, float lambda2)
         {
             return (4.0f * amp / lambda2) * Math.Abs(((t - lambda2 / 4.0f) % lambda2) - lambda2/2.0f) - amp;
