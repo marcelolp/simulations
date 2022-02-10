@@ -36,9 +36,13 @@ namespace ReactionDiffusionSimulation
         /// ==================================== Initial condition function ======================================= ///
         (float, float) I(int x, int y) => (Util.Dist(x, y, NX/2, NY/2) < NY/10 + _rng.Next(NY/10)) ? (0.5f, 0.25f) : (1.0f, 0.0f);
         /// ======================================== Feed function for u ========================================== ///
-        float F(int x, int y, float t) => 0.02f + 0.03f * y/NY;
+        //float F(int x, int y, float t) => 0.02f + 0.03f * y/NY;
+        //float F(int x, int y, float t) => 0.006f + 0.005f * y/NY;
+        float F(int x, int y, float t) => 0.0f + 0.01f * y/NY;
         /// ======================================== Kill function for v ========================================== ///
-        float K(int x, int y, float t) => 0.05f + 0.015f * x/NX;
+        //float K(int x, int y, float t) => 0.05f + 0.015f * x/NX;
+        //float K(int x, int y, float t) => 0.045f + 0.003f * x/NX;
+        float K(int x, int y, float t) => 0.03f + 0.02f * x/NX;
         /// ================================ Reaction function between u and v ==================================== ///
         float R(int x, int y, float u, float v, float t) => u * v * v;
         /// =================================== Diffusion rate for u and v ======================================== ///

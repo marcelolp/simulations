@@ -17,8 +17,8 @@ namespace SimpleWaveSimulation
     {
         private const bool SAVE_TO_FILE = false;
         private const bool USE_REAL_TIME = false;           // simulation runs as fast as it can while stying stable, realtime is not really possible
-        private const int SIM_WIDTH = 1600;
-        private const int SIM_HEIGHT = 900;
+        private const int SIM_WIDTH = 1600/2;
+        private const int SIM_HEIGHT = 900/2;
         private const float FIXED_DELTA = 0.001f;
         private const float MAX_FRAMERATE = 30.0f;
         private const float MIN_DELTA = 1000.0f / MAX_FRAMERATE;

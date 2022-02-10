@@ -17,8 +17,8 @@ namespace ReactionDiffusionSimulation
     {
         private const bool SAVE_TO_FILE = false;
         private const bool USE_REAL_TIME = false;           // simulation runs as fast as it can while stying stable, realtime is not really possible
-        private const int SIM_WIDTH = 1600/2;
-        private const int SIM_HEIGHT = 900/2;
+        private const int SIM_WIDTH = 1600/5;
+        private const int SIM_HEIGHT = 900/5;
         private const float FIXED_DELTA = 0.75f;
         private const float MAX_FRAMERATE = 60.0f;
         private const float MIN_DELTA = 1000.0f / MAX_FRAMERATE;
