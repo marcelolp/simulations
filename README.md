@@ -15,5 +15,6 @@ create interesting results and in the Windows.cs-file are general parameters lik
   functionality for custom boundary conditions, domain properties and generator functions
 3. *ReactionDiffusionSimulation*: Solves the equation for a two component reaction diffusion system for 
   some given parameters that can be edited
+4. *FallingSandSimulation*: A cellular automaton that crudely emulates physical behaviour. Also known as falling sand game
 
 #### Advise for optimization or improvement is always welcome!
