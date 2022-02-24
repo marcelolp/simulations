@@ -68,6 +68,11 @@ namespace SimMath
             return (v2 * t) + (v1 * (1.0f - t));
         }
 
+        public static (float, float, float) Lerp((float, float, float) v1, (float, float, float) v2, float t)
+        {
+            return (Lerp(v1.Item1, v2.Item1, t), Lerp(v1.Item2, v2.Item2, t), Lerp(v1.Item3, v2.Item3, t));
+        }
+
         /// <summary>
         /// Uses a cosine to interpolate instead of a linear function
         /// </summary>

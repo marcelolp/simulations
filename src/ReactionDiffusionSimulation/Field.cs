@@ -103,12 +103,6 @@ namespace ReactionDiffusionSimulation
                     int xminus = x - 1 < 0 ? NX - 1 : x - 1;
                     int xplus  = x + 1 > NX - 1 ? 0 : x + 1;
 
-                    if (x == NX/3 && y == NY/3)
-                    {
-                        x++;
-                        x--;
-                    }
-
                     float u_xy = _u[x + y * NX];
                     float v_xy = _v[x + y * NX];
 

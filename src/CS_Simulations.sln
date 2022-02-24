@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31729.503
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimMath", "SimMath\SimMath.csproj", "{49EF18B2-DCFC-49E0-A133-D49A61F2ECED}"
 EndProject
@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeatSimulation", "HeatSimul
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Integration", "Integration\Integration.csproj", "{FCE3716F-2A47-4FE0-A962-ED8C10348FCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactionDiffusionSimulation", "ReactionDiffusionSimulation\ReactionDiffusionSimulation.csproj", "{B0E28DE6-F3E6-4268-9740-BF4FFD656CD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactionDiffusionSimulation", "ReactionDiffusionSimulation\ReactionDiffusionSimulation.csproj", "{B0E28DE6-F3E6-4268-9740-BF4FFD656CD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FallingSandSimulation", "FallingSandSimulation\FallingSandSimulation.csproj", "{A80BD3AB-2B24-4F14-B42A-6416F497C30E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{B0E28DE6-F3E6-4268-9740-BF4FFD656CD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0E28DE6-F3E6-4268-9740-BF4FFD656CD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0E28DE6-F3E6-4268-9740-BF4FFD656CD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A80BD3AB-2B24-4F14-B42A-6416F497C30E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A80BD3AB-2B24-4F14-B42A-6416F497C30E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A80BD3AB-2B24-4F14-B42A-6416F497C30E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A80BD3AB-2B24-4F14-B42A-6416F497C30E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
